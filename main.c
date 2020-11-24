@@ -11,18 +11,20 @@
 #include <stdlib.h>
 #include <limits.h>
 
-
 // Check if e is an element of the divider set of n
 #define IS_E_OF_T(n,e) (((unsigned int)n) % ((unsigned int)e) == 0)
 
 // get the coresponding not value of p
 #define GET_NOT(n,p) ((n)/(p))
 
+// determins witch number is bigger
+#define GET_BIGGER_NUMBER(p,q) (((p) > (q)) ? (p) : (q))
+
 // used for operation selection in the code though argument parsing
 typedef enum {
   op_not = 3,
-  op_kgv = 2,
-  op_ggt = 1,
+  op_scm = 2,
+  op_gcd = 1,
   op_fuck = 0
 } op_codes;
 
@@ -53,27 +55,47 @@ void print_divider_set(unsigned int n){
 }
 
 /**
- * get_ggt
+ * get_gcd
  *
+ * @info: calculates the greatest common devider of p and q
+ *
+ * @param[in]: p: Natural number and Element of the deivider set
+ * @param[in]: q: Natural number and Element of the deivider set
+ *
+ * @return: the greates common devider
  */
-unsigned int get_ggt(unsigned int p, unsigned int q){
-  unsigned int max = (p > q) ? p : q;
-  unsigned int rslt = 0;
+unsigned int get_gcd(unsigned int p, unsigned int q){
+  unsigned int max = GET_BIGGER_NUMBER(p,q); 
+  unsigned int rslt = 0; 
 
+  // for every number between 1 and p or q, witchever is bigger then the other
   for (int i = 1; i <= max; i++)
+    // if the modulo opperation beweent p or q and i results in 0,
+    // i is a divider of both p and q.
     if ((p % i == 0) && (q % i == 0)) rslt = i;
   return rslt;
 }
 
 /**
- * get_kgv
+ * get_scm
  *
+ * @info: calculates the smalest common multible of p and q
+ *
+ * @param[in]: p: Natural number and Element of the deivider set
+ * @param[in]: q: Natural number and Element of the deivider set
+ *
+ * @return: the smalest common multible
  */
-unsigned int get_kgv(unsigned int p, unsigned int q){
-  unsigned int i = (p > q) ? p : q; 
+unsigned int get_scm(unsigned int p, unsigned int q){
+  unsigned int i = GET_BIGGER_NUMBER(p,q); 
   unsigned int rslt = 0;
 
+  // for every number between p or q, witchever is bigger then the other,
+  // and the Maximum numeric value of unsigned int.
+  // Or, when the scm was determend.
   while ((i < UINT_MAX) && (rslt == 0)){
+    // if the modulo opperation beweent i and p or q results in 0,
+    // i is a multible of both p and q.
     if ((i % p == 0) && (i % q == 0)) rslt = i;
     i++;
   } 
@@ -83,6 +105,13 @@ unsigned int get_kgv(unsigned int p, unsigned int q){
 /**
  * is_number_g0
  *
+ * @info: checks if the parameter string is a number and if the number is
+ *        greater then 0
+ *
+ * @param[in]: str: should be a value from argv containing a number 
+ *
+ * @return: the number, if everything went well
+ *          0, when something went wrong
  */
 unsigned int is_number_g0(const char* str){
   unsigned int n = 0;
@@ -94,12 +123,22 @@ unsigned int is_number_g0(const char* str){
 /**
  * op_pars
  *
+ * @info: used to determen what opperation was selected by argument
+ *
+ * @param[in]: str: should be a value from argv containing the abbreviation of
+ *                  the opperation.
+ *
+ * @return op_code of the corosponding opperation or the error value of
+ *         op_codes
  */
 op_codes op_pars(const char* str){
   char rslt[4] = {'\0','\0','\0','\0'};
-  if (sscanf(str,"%c%c%c%c",rslt ,rslt + 1,rslt + 2,rslt + 3) == 3){
-    if ( rslt[0] == 'g' && rslt[1] == 'g' && rslt[2] == 't' ) return op_ggt;
-    if ( rslt[0] == 'k' && rslt[1] == 'g' && rslt[2] == 'v' ) return op_kgv;
+  if (sscanf(str,"%c%c%c%c", rslt, (rslt + 1), (rslt + 2), (rslt + 3)) == 3){
+    // greatest common devider
+    if ( rslt[0] == 'g' && rslt[1] == 'c' && rslt[2] == 'd' ) return op_gcd;
+    // smalest common multible
+    if ( rslt[0] == 's' && rslt[1] == 'c' && rslt[2] == 'm' ) return op_scm;
+    // not... yeah... who would have though?! ( ._.)
     if ( rslt[0] == 'n' && rslt[1] == 'o' && rslt[2] == 't' ) return op_not;
   }
   return op_fuck;
@@ -114,17 +153,17 @@ int main (const int argc, const char* argv[]){
   unsigned char op = 0;
 
   switch (argc){
-    case(2):
+    case(2): // Print the divider set
       n = is_number_g0(argv[1]);
       if (n != 0)
         print_divider_set(n);
       else {
         fprintf(stderr,"n is 0\n");  
         return 1;
-      } // Print T_n
+      }
     break;
     
-    case(4): // Print Not p
+    case(4): // Print not p
       n  = is_number_g0(argv[1]);
       p  = is_number_g0(argv[3]);
       if (n == 0){
@@ -136,7 +175,7 @@ int main (const int argc, const char* argv[]){
       } else fprintf(stderr,"unkown op or p not e of T\n");
     break;
 
-    case(5): // Print kgv/ggt of p and q
+    case(5): // Print scm/gcd of p and q
       n  = is_number_g0(argv[1]);
       op = op_pars(argv[2]);
       p  = is_number_g0(argv[3]);
@@ -147,10 +186,11 @@ int main (const int argc, const char* argv[]){
       }
       if ((IS_E_OF_T(n,p)) && (IS_E_OF_T(n,q))){
         switch(op){
-          case(op_ggt): printf("%d\n",get_ggt(p,q));
+          // Print the greatest common devider
+          case(op_gcd): printf("%d\n",get_gcd(p,q));
           break;
-          
-          case(op_kgv):printf("%d\n",get_kgv(p,q));
+          // Print the smalest common multible
+          case(op_scm):printf("%d\n",get_scm(p,q));
           break;
           
           default: 
