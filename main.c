@@ -12,7 +12,7 @@
 #include <limits.h>
 
 // Check if e is an element of the divider set of n
-#define IS_E_OF_T(n,e) (((unsigned int)n) % ((unsigned int)e) == 0)
+#define IS_E_OF_T(n,e) ((e != 0)&&(((unsigned int)n) % ((unsigned int)e) == 0))
 
 // get the coresponding not value of p
 #define GET_NOT(n,p) ((n)/(p))
@@ -116,7 +116,7 @@ unsigned int get_scm(unsigned int p, unsigned int q){
 unsigned int is_number_g0(const char* str){
   unsigned int n = 0;
   unsigned char dummy = '\0';
-  if ((sscanf(str,"%d%c",&n,&dummy) == 1) && (n > 0)) return n;
+  if ((sscanf(str,"%d%c",&n,&dummy) == 1) && (atoi(str) > 0)) return n;
   else return 0;
 }
 
@@ -158,7 +158,7 @@ int main (const int argc, const char* argv[]){
       if (n != 0)
         print_divider_set(n);
       else {
-        fprintf(stderr,"n is 0\n");  
+        fprintf(stderr,"n is 0 or not a number\n");  
         return 1;
       }
     break;
@@ -167,7 +167,7 @@ int main (const int argc, const char* argv[]){
       n  = is_number_g0(argv[1]);
       p  = is_number_g0(argv[3]);
       if (n == 0){
-        fprintf(stderr,"n is 0\n");  
+        fprintf(stderr,"n is 0 or not a number\n");  
         return 1;
       }
       if (IS_E_OF_T(n,p) && (op_pars(argv[2]) == op_not)){
@@ -181,7 +181,7 @@ int main (const int argc, const char* argv[]){
       p  = is_number_g0(argv[3]);
       q  = is_number_g0(argv[4]);
       if (n == 0){
-        fprintf(stderr,"n is 0\n");  
+        fprintf(stderr,"n is 0 or not a number\n");  
         return 1;
       }
       if ((IS_E_OF_T(n,p)) && (IS_E_OF_T(n,q))){
@@ -198,7 +198,7 @@ int main (const int argc, const char* argv[]){
             return 1;
         }
       } else {
-        fprintf(stderr,"p or q not e of T\n");  
+        fprintf(stderr,"p or q not e of T or not a number\n");  
         return 1; 
       }
     break;
