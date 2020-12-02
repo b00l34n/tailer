@@ -20,6 +20,9 @@
 // determins witch number is bigger
 #define GET_BIGGER_NUMBER(p,q) (((p) > (q)) ? (p) : (q))
 
+// a modulo for negativ devidents that work with the euclid algoeithem
+#define negMOD(n,m) ((n)-(((n)/(m))-1)*(m))
+ 
 // used for operation selection in the code though argument parsing
 typedef enum {
   op_not = 3,
@@ -144,6 +147,25 @@ op_codes op_pars(const char* str){
   return op_fuck;
 }
 
+/**
+ * euclidGCD
+ *
+ * @info: an other way to determin the greatest common devider between two 
+ *        numbers
+ *
+ * @param[in]: p: Natural number and Element of the deivider set
+ * @param[in]: q: Natural number and Element of the deivider set
+ *
+ * @return: the greates common devider
+ */
+int euclidGCD(int q, int p){
+  int r = 0;
+  if (q > 0) r = q % p;
+  if (q < 0) r = negMOD(q,p);
+  if (r == 0) return p;
+  else euclidGCD(p,r);
+}
+
 /*****************************************************************************/
 
 int main (const int argc, const char* argv[]){
@@ -187,7 +209,8 @@ int main (const int argc, const char* argv[]){
       if ((IS_E_OF_T(n,p)) && (IS_E_OF_T(n,q))){
         switch(op){
           // Print the greatest common devider
-          case(op_gcd): printf("%d\n",get_gcd(p,q));
+          case(op_gcd): printf("%d\n",euclidGCD(p,q));
+          //case(op_gcd): printf("%d\n",get_gcd(p,q));
           break;
           // Print the smalest common multible
           case(op_scm):printf("%d\n",get_scm(p,q));
